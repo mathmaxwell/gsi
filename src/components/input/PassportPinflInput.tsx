@@ -24,8 +24,7 @@ const PassportPinflInput: React.FC<PassportPinflInputProps> = ({
 		if (value[0] && /[A-Z]/.test(value[0])) {
 			const letters = value.slice(0, 2).replace(/[^A-Z]/g, '')
 			const digits = value.slice(2).replace(/[^0-9]/g, '')
-value = (letters + digits).slice(0, 9)
-
+			value = (letters + digits).slice(0, 9)
 		} else {
 			value = value.replace(/[^0-9]/g, '').slice(0, 14)
 		}
@@ -33,7 +32,7 @@ value = (letters + digits).slice(0, 9)
 		onChange?.(value)
 	}
 
-const isPassportValid = /^[A-Z]{2}[0-9]{7}$/.test(internalValue)
+	const isPassportValid = /^[A-Z]{2}[0-9]{7}$/.test(internalValue)
 
 	const isPinflValid = /^\d{14}$/.test(internalValue)
 	const isValid = isPassportValid || isPinflValid
@@ -70,7 +69,7 @@ const isPassportValid = /^[A-Z]{2}[0-9]{7}$/.test(internalValue)
 					},
 				}}
 				fullWidth
-				placeholder={`AA123456 | ${translation[lang].PINFL}`}
+				placeholder={`AA1234567 | ${translation[lang].PINFL}`}
 				value={internalValue}
 				onChange={handleChange}
 				error={!!internalValue && !isValid}

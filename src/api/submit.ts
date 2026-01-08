@@ -15,6 +15,7 @@ export async function onSubmit({
 	video: string
 }) {
 	try {
+		alert('onSubmit ishladi try')
 		const response = await api.post('/api/v1/gsi/verify_b64', {
 			doc_seria,
 			doc_number,
@@ -31,6 +32,7 @@ export async function onSubmit({
 		return response.data as IPerson
 	} catch (error) {
 		console.error(error)
+		alert('onSubmit ishladi catch !!!!')
 		throw error
 	}
 }

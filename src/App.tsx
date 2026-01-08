@@ -7,6 +7,7 @@ function App() {
 		<>
 			<Routes>
 				<Route path='/' element={<HomePage />} />
+				<Route path='*' element={<HomePage />} />
 				<Route path='/hamkor' element={<HomePage />} />
 				<Route path='/hamkor/:lang' element={<Register />} />
 				<Route path='/hamkor/:lang/:pinfl/:birthday' element={<Video />} />
