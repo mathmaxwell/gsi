@@ -46,7 +46,7 @@ export async function onSubmit({
 }) {
 	try {
 		const requestId = uuidv4()
-		const response = await api.post('/api/v1/gsi/verify_b64', {
+		const response = await api.post('/face-api/api/v1/gsi/verify_b64', {
 			doc_seria,
 			doc_number,
 			doc_pinfl,
