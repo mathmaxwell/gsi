@@ -1,5 +1,6 @@
 import api from './axios'
 import type { IPerson } from '../types/person/persoon'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function onSubmit({
 	doc_seria,
@@ -15,7 +16,7 @@ export async function onSubmit({
 	video: string
 }) {
 	try {
-		alert('onSubmit ishladi try')
+		const requestId = uuidv4()
 		const response = await api.post('/api/v1/gsi/verify_b64', {
 			doc_seria,
 			doc_number,
@@ -23,7 +24,7 @@ export async function onSubmit({
 			birth_date,
 			video, // base64
 			clientId: 'unknown',
-			requestId: 'unknown',
+			requestId: requestId,
 			serviceName: 'unknown',
 			userId: 'unknown',
 			token: 'unknown',

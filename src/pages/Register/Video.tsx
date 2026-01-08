@@ -39,15 +39,10 @@ const Video = () => {
 
 		// Функция для завершения записи и отправки видео
 		window.submitVideo = async () => {
-			alert('1')
 			const blob = _base64ChunksToBlob(videoChunks)
-			alert('2')
 			setVideoBlob(blob)
-			alert('3')
 			const base64Video = await blobToBase64(blob)
-			alert('4')
 			setVideoBase(base64Video)
-			alert('5')
 			const result = await onSubmit({
 				doc_number: parsePinfl(pinfl).doc_number,
 				doc_pinfl: parsePinfl(pinfl).doc_pinfl,
