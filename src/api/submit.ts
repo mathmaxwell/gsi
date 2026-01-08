@@ -2,6 +2,36 @@ import api from './axios'
 import type { IPerson } from '../types/person/persoon'
 import { v4 as uuidv4 } from 'uuid'
 
+const getErrorMessage = (error: any) => {
+	let errorMessage = 'Unknown error'
+	if (typeof error === 'string') {
+		errorMessage = error
+	} else if (typeof error === 'object' && error !== null) {
+		// Support any type of error from the Web3 Provider...
+		if (error?.error?.message !== undefined) {
+			errorMessage = error.error.message
+		} else if (error?.data?.message !== undefined) {
+			errorMessage = error.data.message
+		} else if (error?.message !== undefined) {
+			errorMessage = error.message
+		}
+	}
+	return errorMessage
+}
+
+const errorData = (error: Error) => {
+	const propertyNames = Object.getOwnPropertyNames(error)
+	const result = {}
+	propertyNames.forEach(property => {
+		const descriptor = Object.getOwnPropertyDescriptor(error, property) || {}
+		if ('value' in descriptor) {
+			// @ts-ignore
+			result[property] = descriptor.value
+		}
+	})
+	return result
+}
+
 export async function onSubmit({
 	doc_seria,
 	doc_number,
@@ -33,7 +63,12 @@ export async function onSubmit({
 		return response.data as IPerson
 	} catch (error) {
 		console.error(error)
-		alert('onSubmit ishladi catch !!!!')
+		alert(
+			JSON.stringify({
+				message: getErrorMessage(error),
+				error: errorData(error as any),
+			})
+		)
 		throw error
 	}
 }
