@@ -59,7 +59,7 @@ export async function onSubmit({
 			token: 'unknown',
 		})
 
-		return response.data as IPerson
+		return response.data.data as IPerson
 	} catch (error) {
 		console.error(error)
 		alert(

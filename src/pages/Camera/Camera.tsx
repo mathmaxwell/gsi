@@ -1,15 +1,42 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { FaceDetection } from '@mediapipe/face_detection'
 import { Camera } from '@mediapipe/camera_utils'
 import { blobToBase64 } from '../../functions/scale'
 import { onSubmit } from '../../api/submit'
 import { parsePinfl } from '../../functions/func'
 import { useParams } from 'react-router-dom'
+import type { IPerson } from '../../types/person/persoon'
+import LoadingProgress from '../../components/loading/LoadingProgress'
 
-const RECORD_TIME = 5000 // 5 секунд
+const RECORD_TIME = 5000
 
-const CameraVideo = () => {
+const CameraVideo = ({
+	setPerson,
+}: {
+	setPerson: React.Dispatch<React.SetStateAction<IPerson | undefined>>
+}) => {
+	const [time, setTime] = useState<number>(Math.ceil(RECORD_TIME / 1000))
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+	useEffect(() => {
+		if (time <= 0) return
+		const interval = setInterval(() => {
+			setTime(prev => {
+				if (prev <= 1) {
+					clearInterval(interval)
+					return 0
+				}
+				return prev - 1
+			})
+		}, 1000)
+
+		return () => clearInterval(interval)
+	}, [time])
+	const formatTime = (seconds: number) => {
+		const m = Math.floor(seconds / 60)
+		const s = seconds % 60
+		return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+	}
 	const { pinfl, birthday } = useParams()
 	const videoRef = useRef<HTMLVideoElement | null>(null)
 	const streamRef = useRef<MediaStream | null>(null)
@@ -68,7 +95,7 @@ const CameraVideo = () => {
 
 			const cx = 640
 			const cy = 360
-			const r = 250 // Немного увеличил радиус проверки под новый большой круг
+			const r = 250
 
 			const dx = x - cx
 			const dy = y - cy
@@ -93,76 +120,68 @@ const CameraVideo = () => {
 		}
 	}
 
-const startRecording = (stream: MediaStream) => {
-	// Список предпочтительных MIME-типов (MP4 в приоритете)
-	const preferredTypes = [
-		'video/mp4;codecs=avc1', // Лучший вариант для твоего сервера
-		'video/mp4',
-		'video/webm;codecs=vp9',
-		'video/webm;codecs=vp8',
-		'video/webm',
-	]
+	const startRecording = (stream: MediaStream) => {
+		const preferredTypes = [
+			'video/mp4;codecs=avc1',
+			'video/mp4',
+			'video/webm;codecs=vp9',
+			'video/webm;codecs=vp8',
+			'video/webm',
+		]
 
-	let mimeType = preferredTypes.find(type =>
-		MediaRecorder.isTypeSupported(type)
-	)
+		let mimeType = preferredTypes.find(type =>
+			MediaRecorder.isTypeSupported(type)
+		)
 
-	if (!mimeType) {
-		console.error('Ни один видеоформат не поддерживается браузером')
-		return
-	}
-
-	console.log('Используемый mimeType:', mimeType) // Для отладки — увидишь, что выбралось
-
-	const recorder = new MediaRecorder(stream, { mimeType })
-
-	chunksRef.current = []
-
-	recorder.ondataavailable = e => {
-		if (e.data.size > 0) {
-			chunksRef.current.push(e.data)
+		if (!mimeType) {
+			console.error('Ни один видеоформат не поддерживается браузером')
+			return
 		}
-	}
+		const recorder = new MediaRecorder(stream, { mimeType })
 
-	recorder.onstop = async () => {
-		// Определяем правильный тип для Blob (важно для корректного base64)
-		const blobType = mimeType.includes('mp4') ? 'video/mp4' : 'video/webm'
-		const blob = new Blob(chunksRef.current, { type: blobType })
+		chunksRef.current = []
 
-		// Конвертируем в base64 БЕЗ префикса data:url
-		const base64 = await blobToBase64(blob) // твоя функция должна возвращать чистый base64
-
-		// Для надёжности — если твоя blobToBase64 возвращает с префиксом, обрезаем:
-		const cleanBase64 =
-			typeof base64 === 'string' && base64.includes(',')
-				? base64.split(',')[1]
-				: base64
-
-		try {
-			const result = await onSubmit({
-				doc_number: parsePinfl(pinfl).doc_number,
-				doc_pinfl: parsePinfl(pinfl).doc_pinfl,
-				doc_seria: parsePinfl(pinfl).doc_seria,
-				birth_date: birthday || '',
-				video: cleanBase64, // ← чистый base64 без префикса
-			})
-			console.log('Успешно отправлено:', result)
-		} catch (err) {
-			console.error('Ошибка отправки:', err)
+		recorder.ondataavailable = e => {
+			if (e.data.size > 0) {
+				chunksRef.current.push(e.data)
+			}
 		}
-	}
 
-	recorder.start()
+		recorder.onstop = async () => {
+			const blobType = mimeType.includes('mp4') ? 'video/mp4' : 'video/webm'
+			const blob = new Blob(chunksRef.current, { type: blobType })
+			const base64 = await blobToBase64(blob)
+			const cleanBase64 =
+				typeof base64 === 'string' && base64.includes(',')
+					? base64.split(',')[1]
+					: base64
 
-	// Останавливаем через 5 секунд
-	setTimeout(() => {
-		if (recorder.state !== 'inactive') {
-			recorder.stop()
+			try {
+				setIsLoading(true)
+				const result = await onSubmit({
+					doc_number: parsePinfl(pinfl).doc_number,
+					doc_pinfl: parsePinfl(pinfl).doc_pinfl,
+					doc_seria: parsePinfl(pinfl).doc_seria,
+					birth_date: birthday || '',
+					video: cleanBase64,
+				})
+				setPerson(result)
+				setIsLoading(false)
+			} catch (err) {
+				console.error('Ошибка отправки:', err)
+				setIsLoading(false)
+			}
 		}
-	}, RECORD_TIME)
 
-	mediaRecorderRef.current = recorder
-}
+		recorder.start()
+		setTimeout(() => {
+			if (recorder.state !== 'inactive') {
+				recorder.stop()
+			}
+		}, RECORD_TIME)
+
+		mediaRecorderRef.current = recorder
+	}
 
 	const stopAll = () => {
 		mediaRecorderRef.current?.stop()
@@ -176,12 +195,12 @@ const startRecording = (stream: MediaStream) => {
 			sx={{
 				position: 'relative',
 				width: '100%',
-				height: '100vh', // Полноэкранно, чтобы круг занимал почти весь экран
+				height: '100vh',
 				backgroundColor: 'white',
 				overflow: 'hidden',
 			}}
 		>
-			{/* Клиппинг-контейнер: видео только внутри круга */}
+			{isLoading && <LoadingProgress />}
 			<Box
 				sx={{
 					position: 'absolute',
@@ -208,7 +227,6 @@ const startRecording = (stream: MediaStream) => {
 				/>
 			</Box>
 
-			{/* Индикатор круга (border) */}
 			<Box
 				sx={{
 					position: 'absolute',
@@ -223,6 +241,9 @@ const startRecording = (stream: MediaStream) => {
 					boxSizing: 'border-box',
 				}}
 			/>
+			<Typography variant='h4' color='success' textAlign={'center'}>
+				{formatTime(time)}
+			</Typography>
 		</Box>
 	)
 }

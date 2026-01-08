@@ -47,9 +47,7 @@ const Video = () => {
 			})
 			setPerson(result)
 		}
-		window.cancelVideo = () => {
-			console.log('Запись видео отменена')
-		}
+		window.cancelVideo = () => {}
 		if (get(window, 'webkit.messageHandlers.requestVideoMessage.postMessage')) {
 			window.webkit?.messageHandlers?.requestVideoMessage?.postMessage()
 			setBrowser(false)
@@ -60,14 +58,14 @@ const Video = () => {
 			setBrowser(true)
 		}
 	}, [])
+
 	return (
 		<>
-			{browser && (
-				<>
-					<Camera />
-				</>
+			{person == undefined ? (
+				browser && <Camera setPerson={setPerson} />
+			) : (
+				<>{person.last_name}</>
 			)}
-			{person?.birth_country && person.birth_country}
 		</>
 	)
 }
