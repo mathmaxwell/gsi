@@ -24,7 +24,8 @@ const PassportPinflInput: React.FC<PassportPinflInputProps> = ({
 		if (value[0] && /[A-Z]/.test(value[0])) {
 			const letters = value.slice(0, 2).replace(/[^A-Z]/g, '')
 			const digits = value.slice(2).replace(/[^0-9]/g, '')
-			value = (letters + digits).slice(0, 8)
+value = (letters + digits).slice(0, 9)
+
 		} else {
 			value = value.replace(/[^0-9]/g, '').slice(0, 14)
 		}
@@ -32,7 +33,8 @@ const PassportPinflInput: React.FC<PassportPinflInputProps> = ({
 		onChange?.(value)
 	}
 
-	const isPassportValid = /^[A-Z]{2}[0-9]{6}$/.test(internalValue)
+const isPassportValid = /^[A-Z]{2}[0-9]{7}$/.test(internalValue)
+
 	const isPinflValid = /^\d{14}$/.test(internalValue)
 	const isValid = isPassportValid || isPinflValid
 	const getTypeLabel = () => {

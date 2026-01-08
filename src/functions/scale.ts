@@ -10,3 +10,13 @@ export function _base64ChunksToBlob(videoChunks: string[]) {
 	})
 	return new Blob(byteArrays, { type: 'video/mp4' })
 }
+export function blobToBase64(blob: Blob): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader()
+		reader.onloadend = () => {
+			resolve(reader.result as string)
+		}
+		reader.onerror = reject
+		reader.readAsDataURL(blob)
+	})
+}
