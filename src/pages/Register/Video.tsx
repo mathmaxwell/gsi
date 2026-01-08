@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { get } from 'lodash'
 import { _base64ChunksToBlob, blobToBase64 } from '../../functions/scale'
 import type { IPerson } from '../../types/person/persoon'
-import { onSubmit } from '../../api/submit'
+import { onSubmitNative } from '../../api/submit'
 import { useParams } from 'react-router-dom'
 import { parsePinfl } from '../../functions/func'
 import Camera from '../Camera/Camera'
@@ -38,7 +38,7 @@ const Video = () => {
 			const blob = _base64ChunksToBlob(videoChunks)
 
 			const base64Video = await blobToBase64(blob)
-			const result = await onSubmit({
+			const result = await onSubmitNative({
 				doc_number: parsePinfl(pinfl).doc_number,
 				doc_pinfl: parsePinfl(pinfl).doc_pinfl,
 				doc_seria: parsePinfl(pinfl).doc_seria,
