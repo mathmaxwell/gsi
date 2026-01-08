@@ -85,30 +85,46 @@ export async function onSubmitNative({
 	video: string
 }) {
 	try {
-		const requestId = uuidv4()
-		const response = await api.post(
+		const requestId = crypto.randomUUID()
+		const response = await fetch(
 			'https://face.mbabm.uz/api/v1/gsi/verify_b64',
 			{
-				doc_seria,
-				doc_number,
-				doc_pinfl,
-				birth_date,
-				video, // base64
-				clientId: 'unknown',
-				requestId: requestId,
-				serviceName: 'unknown',
-				userId: 'unknown',
-				token: 'unknown',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					doc_seria,
+					doc_number,
+					doc_pinfl,
+					birth_date,
+					video, // base64
+					clientId: 'unknown',
+					requestId,
+					serviceName: 'unknown',
+					userId: 'unknown',
+					token: 'unknown',
+				}),
 			}
 		)
 
-		return response.data.data as IPerson
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => null)
+			throw new Error(
+				`Request failed with status ${response.status}: ${JSON.stringify(
+					errorData
+				)}`
+			)
+		}
+
+		const data = await response.json()
+		return data.data as IPerson
 	} catch (error) {
 		console.error(error)
 		alert(
 			JSON.stringify({
-				message: getErrorMessage(error),
-				error: errorData(error as any),
+				message: (error as Error).message,
+				error,
 			})
 		)
 		throw error
