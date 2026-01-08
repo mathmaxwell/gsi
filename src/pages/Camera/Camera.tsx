@@ -93,35 +93,76 @@ const CameraVideo = () => {
 		}
 	}
 
-	const startRecording = (stream: MediaStream) => {
-		const recorder = new MediaRecorder(stream, {
-			mimeType: 'video/webm',
-		})
+const startRecording = (stream: MediaStream) => {
+	// Список предпочтительных MIME-типов (MP4 в приоритете)
+	const preferredTypes = [
+		'video/mp4;codecs=avc1', // Лучший вариант для твоего сервера
+		'video/mp4',
+		'video/webm;codecs=vp9',
+		'video/webm;codecs=vp8',
+		'video/webm',
+	]
 
-		chunksRef.current = []
+	let mimeType = preferredTypes.find(type =>
+		MediaRecorder.isTypeSupported(type)
+	)
 
-		recorder.ondataavailable = e => {
-			if (e.data.size) chunksRef.current.push(e.data)
+	if (!mimeType) {
+		console.error('Ни один видеоформат не поддерживается браузером')
+		return
+	}
+
+	console.log('Используемый mimeType:', mimeType) // Для отладки — увидишь, что выбралось
+
+	const recorder = new MediaRecorder(stream, { mimeType })
+
+	chunksRef.current = []
+
+	recorder.ondataavailable = e => {
+		if (e.data.size > 0) {
+			chunksRef.current.push(e.data)
 		}
+	}
 
-		recorder.onstop = async () => {
-			const blob = new Blob(chunksRef.current, { type: 'video/webm' })
-			const base64 = await blobToBase64(blob)
+	recorder.onstop = async () => {
+		// Определяем правильный тип для Blob (важно для корректного base64)
+		const blobType = mimeType.includes('mp4') ? 'video/mp4' : 'video/webm'
+		const blob = new Blob(chunksRef.current, { type: blobType })
+
+		// Конвертируем в base64 БЕЗ префикса data:url
+		const base64 = await blobToBase64(blob) // твоя функция должна возвращать чистый base64
+
+		// Для надёжности — если твоя blobToBase64 возвращает с префиксом, обрезаем:
+		const cleanBase64 =
+			typeof base64 === 'string' && base64.includes(',')
+				? base64.split(',')[1]
+				: base64
+
+		try {
 			const result = await onSubmit({
 				doc_number: parsePinfl(pinfl).doc_number,
 				doc_pinfl: parsePinfl(pinfl).doc_pinfl,
 				doc_seria: parsePinfl(pinfl).doc_seria,
 				birth_date: birthday || '',
-				video: base64,
+				video: cleanBase64, // ← чистый base64 без префикса
 			})
-			console.log('result', result)
+			console.log('Успешно отправлено:', result)
+		} catch (err) {
+			console.error('Ошибка отправки:', err)
 		}
-
-		recorder.start()
-		mediaRecorderRef.current = recorder
-
-		setTimeout(() => recorder.stop(), RECORD_TIME)
 	}
+
+	recorder.start()
+
+	// Останавливаем через 5 секунд
+	setTimeout(() => {
+		if (recorder.state !== 'inactive') {
+			recorder.stop()
+		}
+	}, RECORD_TIME)
+
+	mediaRecorderRef.current = recorder
+}
 
 	const stopAll = () => {
 		mediaRecorderRef.current?.stop()
