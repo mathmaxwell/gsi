@@ -8,13 +8,16 @@ import { parsePinfl } from '../../functions/func'
 import { useParams } from 'react-router-dom'
 import type { IPerson } from '../../types/person/persoon'
 import LoadingProgress from '../../components/loading/LoadingProgress'
-
 const RECORD_TIME = 5000
 
 const CameraVideo = ({
 	setPerson,
+	setText,
+	setOpen,
 }: {
 	setPerson: React.Dispatch<React.SetStateAction<IPerson | undefined>>
+	setText: React.Dispatch<React.SetStateAction<string>>
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 	const [time, setTime] = useState<number>(Math.ceil(RECORD_TIME / 1000))
 	const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -167,12 +170,15 @@ const CameraVideo = ({
 				})
 				setPerson(result)
 				setIsLoading(false)
+				stopAll()
 			} catch (err) {
-				console.error('Ошибка отправки:', err)
+				const axiosError = err as any
+				console.error('Ошибка отправки:', axiosError.response.data.error)
+				setText(axiosError.response.data.error)
+				setOpen(true)
 				setIsLoading(false)
 			}
 		}
-
 		recorder.start()
 		setTimeout(() => {
 			if (recorder.state !== 'inactive') {
@@ -184,11 +190,35 @@ const CameraVideo = ({
 	}
 
 	const stopAll = () => {
-		mediaRecorderRef.current?.stop()
+		// Сначала останавливаем камеру MediaPipe — это важно!
+		if (cameraRef.current) {
+			cameraRef.current.stop()
+			cameraRef.current = null
+		}
+
+		// Затем останавливаем MediaRecorder
+		if (
+			mediaRecorderRef.current &&
+			mediaRecorderRef.current.state !== 'inactive'
+		) {
+			mediaRecorderRef.current.stop()
+		}
+
+		// Останавливаем треки потока
 		streamRef.current?.getTracks().forEach(t => t.stop())
-		cameraRef.current?.stop()
-		faceDetectionRef.current?.close()
+		streamRef.current = null
+
+		// В конце закрываем face detection
+		if (faceDetectionRef.current) {
+			faceDetectionRef.current.close()
+			faceDetectionRef.current = null
+		}
 	}
+	useEffect(() => {
+		return () => {
+			stopAll()
+		}
+	}, [])
 
 	return (
 		<Box
