@@ -34,6 +34,21 @@ const translation = {
 		citizenship_id: 'Citizenship ID',
 		status: 'Ready',
 		action: 'Back',
+		error_late:
+			'The service is temporarily unavailable. Please try again later',
+		error_check: 'No data was received. Please check the passport details',
+		error_live: 'Face verification failed. Please try again',
+		error_more: 'The photo contains more than one face',
+		eyes_closed: 'Your eyes are closed or not clearly visible',
+		head_turned: 'Please look straight at the camera',
+		multiple_faces: 'The photo contains more than one face',
+		no_face: 'No face was detected in the photo',
+		low_similarity: 'The photo does not match well enough',
+		invalid_passport: 'The passport information is invalid',
+		document_expired: 'The document has expired',
+		invalid_request:
+			'Some information is incorrect. Please check and try again',
+		unknown_error: 'Something went wrong. Please try again',
 	},
 	uz: {
 		login_or_registration: "Kirish yoki ro'yxatdan o'tish",
@@ -42,11 +57,8 @@ const translation = {
 		passport_used: 'Pasport ishlatilmoqda',
 		pinfl_used: 'JShShIR ishlatilmoqda',
 		placeHolderDay: 'KK.OO.YYYY',
-
 		invalid_date: "Noto'g'ri sana",
-
 		date_of_birth: "Tug'ilgan sana",
-
 		continue: 'Продолжить',
 		identity_verification: 'Shaxsni tasdiqlash',
 		photo_from_camera: 'Kameradan olingan surat',
@@ -73,6 +85,21 @@ const translation = {
 		citizenship_id: 'Fuqaroligi ID',
 		status: 'Tayyor',
 		action: 'Orqaga',
+		error_late:
+			"Xizmat vaqtincha ishlamayapti. Iltimos, keyinroq urinib ko'ring",
+		error_check: "Ma'lumot olinmadi. Pasport ma'lumotlarini tekshiring",
+		error_live: "Yuzni tekshirish muvaffaqiyatsiz tugadi. Qayta urinib ko'ring",
+		error_more: 'Suratda bir nechta yuz aniqlandi',
+		eyes_closed: "Ko'zlar yopiq yoki aniq ko'rinmayapti",
+		head_turned: "Iltimos, kameraga to'g'ri qarang",
+		multiple_faces: 'Suratda bir nechta yuz aniqlandi',
+		no_face: 'Suratda yuz aniqlanmadi',
+		low_similarity: 'Surat mos kelmadi',
+		invalid_passport: "Pasport ma'lumotlari noto'g'ri",
+		document_expired: 'Hujjatning amal qilish muddati tugagan',
+		invalid_request:
+			"Ba'zi ma'lumotlar noto'g'ri. Tekshirib qayta urinib ko'ring",
+		unknown_error: "Xatolik yuz berdi. Qayta urinib ko'ring",
 	},
 	ru: {
 		login_or_registration: 'Вход или регистрация',
@@ -111,6 +138,20 @@ const translation = {
 		citizenship_id: 'Citizenship ID',
 		status: 'Готово',
 		action: 'Назад',
+		error_late: 'Сервис временно недоступен. Попробуйте позже',
+		error_check: 'Не удалось получить данные. Проверьте данные паспорта',
+		error_live: 'Проверка лица не пройдена. Попробуйте ещё раз',
+		error_more: 'На фото обнаружено несколько лиц',
+		eyes_closed: 'Глаза закрыты или плохо видны',
+		head_turned: 'Пожалуйста, смотрите прямо в камеру',
+		multiple_faces: 'На фото обнаружено несколько лиц',
+		no_face: 'Лицо на фото не обнаружено',
+		low_similarity: 'Фото недостаточно совпадает',
+		invalid_passport: 'Данные паспорта неверны',
+		document_expired: 'Срок действия документа истёк',
+		invalid_request:
+			'Некоторые данные указаны неверно. Проверьте и попробуйте снова',
+		unknown_error: 'Произошла ошибка. Попробуйте ещё раз',
 	},
 }
 export default translation

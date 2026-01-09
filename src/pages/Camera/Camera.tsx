@@ -6,8 +6,9 @@ import { blobToBase64 } from '../../functions/scale'
 import { onSubmit } from '../../api/submit'
 import { parsePinfl } from '../../functions/func'
 import { useParams } from 'react-router-dom'
-import type { IPerson } from '../../types/person/persoon'
+import type { IPerson } from '../../types/person/person'
 import LoadingProgress from '../../components/loading/LoadingProgress'
+import { getVerificationErrorMessage } from '../../functions/error'
 const RECORD_TIME = 5000
 
 const CameraVideo = ({
@@ -77,8 +78,7 @@ const CameraVideo = ({
 
 	const startFaceDetection = () => {
 		const faceDetection = new FaceDetection({
-			locateFile: file =>
-				`https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`,
+			locateFile: file => `/mediapipe/face_detection/${file}`,
 		})
 
 		faceDetection.setOptions({
@@ -173,8 +173,8 @@ const CameraVideo = ({
 				stopAll()
 			} catch (err) {
 				const axiosError = err as any
-				console.error('Ошибка отправки:', axiosError.response.data.error)
-				setText(axiosError.response.data.error)
+				const errorCode = axiosError.response?.data?.errorCode
+				setText(getVerificationErrorMessage(errorCode))
 				setOpen(true)
 				setIsLoading(false)
 			}

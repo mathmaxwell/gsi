@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import { get } from 'lodash'
-import { _base64ChunksToBlob, blobToBase64 } from '../../functions/scale'
-import type { IPerson } from '../../types/person/persoon'
+import {
+	_base64ChunksToBlob,
+	blobToBase64,
+	createObjectUrlFromBase64Sync,
+} from '../../functions/scale'
+import type { IPerson } from '../../types/person/person'
 import { onSubmit } from '../../api/submit'
 import { useNavigate, useParams } from 'react-router-dom'
 import { parsePinfl } from '../../functions/func'
@@ -42,6 +46,8 @@ const Video = () => {
 	const [browser, setBrowser] = useState(false)
 	const [open, setOpen] = useState(false)
 	const [text, setText] = useState('')
+	const [captureUrl, setCaptureUrl] = useState<string | undefined>(undefined)
+	const [photoUrl, setPhotoUrl] = useState<string | undefined>(undefined)
 	useEffect(() => {
 		const videoChunks: string[] = []
 		window.addBase64Chunk = chunk => {
@@ -49,7 +55,6 @@ const Video = () => {
 		}
 		window.submitVideo = async () => {
 			const blob = _base64ChunksToBlob(videoChunks)
-
 			const base64Video = await blobToBase64(blob)
 			const result = await onSubmit({
 				doc_number: parsePinfl(pinfl).doc_number,
@@ -71,6 +76,24 @@ const Video = () => {
 			setBrowser(true)
 		}
 	}, [])
+	useEffect(() => {
+		if (!person?.capture) {
+			setCaptureUrl(undefined)
+			return
+		}
+		const url = createObjectUrlFromBase64Sync(person.capture, 'image/jpeg')
+		setCaptureUrl(url)
+		return () => URL.revokeObjectURL(url)
+	}, [person?.capture])
+	useEffect(() => {
+		if (!person?.photo) {
+			setPhotoUrl(undefined)
+			return
+		}
+		const url = createObjectUrlFromBase64Sync(person.photo, 'image/jpeg')
+		setPhotoUrl(url)
+		return () => URL.revokeObjectURL(url)
+	}, [person?.photo])
 	if (person) {
 		return (
 			<>
@@ -148,8 +171,8 @@ const Video = () => {
 							}}
 						>
 							<img
-								src={`data:image/png;base64,${person.capture}`}
-								alt='Base64'
+								src={captureUrl}
+								alt='capture'
 								style={{ width: '100%', height: 'auto' }}
 							/>
 							<Typography sx={{ fontWeight: 500, fontSize: '20px' }}>
@@ -166,7 +189,7 @@ const Video = () => {
 							}}
 						>
 							<img
-								src={`data:image/png;base64,${person.photo}`}
+								src={photoUrl}
 								alt='Base64'
 								style={{ width: '100%', height: 'auto' }}
 							/>

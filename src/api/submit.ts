@@ -1,5 +1,5 @@
 import api from './axios'
-import type { IPerson } from '../types/person/persoon'
+import type { IPerson } from '../types/person/person'
 import { v4 as uuidv4 } from 'uuid'
 
 export async function onSubmit({
@@ -17,7 +17,7 @@ export async function onSubmit({
 }) {
 	try {
 		const requestId = uuidv4()
-		const response = await api.post('/face-api/api/v1/gsi/verify_b64', {
+		const response = await api.post('/v1/gsi/verify_b64', {
 			doc_seria,
 			doc_number,
 			doc_pinfl,

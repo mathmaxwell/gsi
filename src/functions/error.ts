@@ -86,3 +86,54 @@ export const VerificationErrorMessage: Record<VerificationErrorCode, string> = {
 	// Generic Error
 	[VerificationErrorCode.UNKNOWN_ERROR]: 'Произошла неизвестная ошибка',
 }
+export function getVerificationErrorMessage(
+	errorCode: string | undefined
+): string {
+	if (!errorCode)
+		return VerificationErrorMessage[VerificationErrorCode.UNKNOWN_ERROR]
+
+	// Если errorCode есть в enum, вернуть сообщение
+	if (
+		Object.values(VerificationErrorCode).includes(
+			errorCode as VerificationErrorCode
+		)
+	) {
+		return VerificationErrorMessage[errorCode as VerificationErrorCode]
+	}
+
+	// Если неизвестный код
+	return VerificationErrorMessage[VerificationErrorCode.UNKNOWN_ERROR]
+}
+export function getErrorText(text: string) {
+	if (text == 'ГЦП недоступен. Попробуйте позже') {
+		return 'error_late'
+	} else if (text == 'ГЦП не передал данные. Проверьте серию и номер паспорта')
+		return 'error_check'
+	else if (text.includes('Не пройден liveness')) {
+		return 'error_live'
+	} else if (
+		text == 'Фото содержит больше одного лица. Обратитесь в поддержку'
+	) {
+		return 'error_more'
+	} else if (text == 'Глаза закрыты или не видны') {
+		return 'eyes_closed'
+	} else if (text == 'Голова повернута') {
+		return 'head_turned'
+	} else if (
+		text == 'Фото из ГЦП содержит больше одного лица. Обратитесь в поддержку'
+	) {
+		return 'multiple_faces'
+	} else if (text == 'Фото из ГЦП не содержит лицо. Обратитесь в поддержку') {
+		return 'no_face'
+	} else if (text == 'Низкое сходство с фото из ГЦП') {
+		return 'low_similarity'
+	} else if (text == 'Паспорт недействителен') {
+		return 'invalid_passport'
+	} else if (text == 'Истек срок действия документа') {
+		return 'document_expired'
+	} else if (text == 'Неверные параметры запроса. Проверьте данные') {
+		return 'invalid_request'
+	} else {
+		return 'unknown_error'
+	}
+}

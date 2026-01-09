@@ -39,92 +39,44 @@ const HomePage = () => {
 					sx={{
 						display: 'flex',
 						flexWrap: 'wrap',
-						gap: { xs: 2, sm: 3 },
+						gap: 2,
 						justifyContent: 'center',
 						width: '100%',
 					}}
 				>
-					<Button
-						onClick={() => navigate('/hamkor/en')}
-						sx={{
-							flex: { xs: '1 1 100%', sm: '1 1 0' },
-							minWidth: { xs: '100%', sm: '280px' },
-
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							gap: 2,
-							padding: { xs: '16px 24px', sm: '12px 24px' },
-							border: '2px solid',
-							borderColor: 'rgb(46, 125, 50)',
-							borderRadius: '12px',
-							backgroundColor: 'transparent',
-						}}
-					>
-						<Typography variant='h5' color='black' sx={{ fontWeight: 500 }}>
-							English
-						</Typography>
-						<img
-							src={english}
-							alt='english'
-							style={{ height: '32px', width: 'auto' }}
-						/>
-					</Button>
-
-					<Button
-						onClick={() => navigate('/hamkor/ru')}
-						sx={{
-							flex: { xs: '1 1 100%', sm: '1 1 0' },
-							minWidth: { xs: '100%', sm: '280px' },
-
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							gap: 2,
-							padding: { xs: '16px 24px', sm: '12px 24px' },
-							border: '2px solid',
-							borderColor: 'rgb(46, 125, 50)',
-							borderRadius: '12px',
-							backgroundColor: 'transparent',
-						}}
-					>
-						<Typography variant='h5' color='black' sx={{ fontWeight: 500 }}>
-							Русский
-						</Typography>
-						<img
-							src={rus}
-							alt='russia'
-							style={{ height: '32px', width: 'auto' }}
-						/>
-					</Button>
-
-					<Button
-						onClick={() => navigate('/hamkor/uz')}
-						sx={{
-							flex: { xs: '1 1 100%', sm: '1 1 0' },
-							minWidth: { xs: '100%', sm: '280px' },
-
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							gap: 2,
-							padding: { xs: '16px 24px', sm: '12px 24px' },
-							border: '2px solid',
-							borderColor: 'rgb(46, 125, 50)',
-							borderRadius: '12px',
-							backgroundColor: 'transparent',
-						}}
-					>
-						<Typography variant='h5' color='black' sx={{ fontWeight: 500 }}>
-							O'zbekcha
-						</Typography>
-						<img
-							src={uzbek}
-							alt='O`zbekcha'
-							style={{ height: '32px', width: 'auto' }}
-						/>
-					</Button>
+					{[
+						{ label: 'English', img: english, path: 'en' },
+						{ label: 'Русский', img: rus, path: 'ru' },
+						{ label: "O'zbekcha", img: uzbek, path: 'uz' },
+					].map(({ label, img, path }) => (
+						<Button
+							key={path}
+							onClick={() => navigate(`/hamkor/${path}`)}
+							sx={{
+								flex: { xs: '1 1 100%', sm: '1 1 calc(33.33% - 16px)' }, // на sm и выше три кнопки в ряд
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 2,
+								padding: { xs: '16px 24px', sm: '12px 24px' },
+								border: '2px solid',
+								borderColor: 'rgb(46, 125, 50)',
+								borderRadius: '12px',
+								backgroundColor: 'transparent',
+							}}
+						>
+							<Typography variant='h5' color='black' sx={{ fontWeight: 500 }}>
+								{label}
+							</Typography>
+							<img
+								src={img}
+								alt={label}
+								style={{ height: '32px', width: 'auto' }}
+							/>
+						</Button>
+					))}
 				</Box>
+
 				<Box
 					sx={{
 						display: 'flex',
